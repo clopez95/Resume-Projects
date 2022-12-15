@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <title>Welcome!</title>
+
+    <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='custom-fonts.css') }}"/>
+
+<style>
+* {box-sizing: border-box; font-family: ubuntu;}
+
+h1 {text-align: center;}
+h2 {text-align: center; margin-left: 25px;}
+h3 {text-align: center;}
+h4 {text-align: center;}
+h5 {text-align: center;}
+
+.fundraiser-boxes{
+    border-radius: 25px;
+    float: left;
+    display: inline-block;
+    width: 400px;
+    height: 600px;
+    border: 5px solid #46D44B;
+    list-style: none;
+    background-color: #8DFA89;
+    padding: 10px;
+    position: relative;
+}
+
+.fundraiser-boxes img {
+    max-width: 100%;
+    height: auto;
+}
+
+.bottom {
+    position: absolute;
+    bottom: 0;
+    width: 95%;}
+
+.options{padding: 20px;}
+
+#OwnedFundraisers{
+    float: center;
+    position: relative;
+    clear: both;}
+
+#donations{
+    float: center;
+    position: relative;
+    clear: both;}
+
+.topnav {
+    overflow: hidden;
+    background-color: #333;}
+
+.header {
+    background-color: #f1f1f1;
+    padding: 30px;
+    text-align: center;}
+
+.topnav a {
+    float: left;
+    display: block;
+    color: #f2f2f2;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-size: 17px;}
+
+.topnav a:hover {
+    background-color: #61C957;
+    color: black;}
+
+body{
+    background: #eee !important;
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;}
+
+.fundraiser-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 25px;
+    justify-content: center;
+}
+
+.container {
+  max-width: 80ch;
+  padding: 20px;
+}
+
+.container p {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+}
+</style>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
+</head>
+
+
+<body>
+
+<!--guest-->
+{% if isGuest == True  %}
+<div class="topnav">
+    <a href="/dashboard">Home</a>
+    <a href="/login">Login</a>
+    <a href="/new-user-form">Sign Up!</a>
+</div>
+{% endif %}
+
+<!--user-->
+{% if isGuest == False  %}
+
+<!--button menu-->
+<div class="topnav">
+    <a href="/dashboard">Home</a>
+    <a href="/new-fundraiser">New Fundraiser</a>
+    <a href="/settings">Settings</a>
+    <a href="/log-out">Log out</a>
+</div>
+{% endif %}
+
+<div class="content">
+    <div class="container-fluid p-5 bg-success text-white text-center">
+        <h1>Hello {{ name }}!</h1>
+        <br>
+        <h2>Welcome to ComeFundMe Fundraising</h2>
+    </div>
+</div>
+
+{% if isGuest == False%}
+<br>
+<h3>Fundraisers You Own:</h3>
+<div id="OwnedFundraisers" class="fundraiser-container">
+
+        {% for row in userOwnedFund %}
+            <div class="fundraiser-boxes">
+                <center>
+                    <li><a href="fundraiser/{{ row[2] }}" style="text-decoration:none">  <h7 style="font-size: 20px"> <strong>{{row[0]}} </strong> <br> </h7> <img src="/static/{{row[3]}}" alt="no image"> </a></li>
+                    Created By: {{row[7]}} <br> <br>
+                    <div class="container">
+                        <p>{{row[1]}}</p>
+                    </div>
+                </center>
+                <br><br>
+                <div class="bottom">
+                    <p style="text-align:left;">
+                        Balance: ${{row[5]}}
+                        <span style="float:right;">
+                            Goal: ${{row[4]}}
+                        </span>
+                    </p>
+                    {% if row[6] >= 100 %}
+                        <div class="w3-container">
+                            <div class="w3-light-grey w3-round-xlarge">
+                                <div class="w3-container w3-green w3-round-xlarge" style="width: 100%"> <center style="color:black;"> {{row[6]}}% </center> </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                    {% if row[6] < 100 %}
+                        <div class="w3-container">
+                            <div class="w3-light-gray w3-round-xlarge">
+                                <div class="w3-container w3-green w3-round-xlarge" style="width: {{row[6]}}%"> <center style="color:black;"> {{row[6]}}% </center></div>
+                            </div>
+                    </div>
+                    {% endif %}
+                    <br>
+                </div>
+
+            </div>
+
+        {% endfor %}
+
+</div>
+
+    <br>
+
+        <h4>Donations You Have Made:</h4>
+        <div id="donations" class="fundraiser-container">
+            {% for row in userDonorTable %}
+            <div class="fundraiser-boxes">
+                <center>
+                    <li><a href="fundraiser/{{ row[2] }}" style="text-decoration:none">  <h7 style="font-size: 20px"> <strong>{{row[0]}} </strong> <br> </h7> <img src="/static/{{row[3]}}" alt="no image" width="350" height="350"> </a></li>
+                    Created By: {{row[7]}} <br> <br>
+                    <div class="container">
+                        <p>{{row[1]}}</p>
+                    </div>
+                </center>
+                <br><br>
+                <div class="bottom">
+                    <p style="text-align:left;">
+                        Balance: ${{row[5]}}
+                        <span style="float:right;">
+                            Goal: ${{row[4]}}
+                        </span>
+                    </p>
+                    {% if row[6] >= 100 %}
+                    <div class="w3-container">
+                        <div class="w3-light-grey w3-round-xlarge">
+                            <div class="w3-container w3-green w3-round-xlarge" style="width: 100%"> <center style="color:black;"> {{row[6]}}% </center> </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if row[6] < 100 %}
+                    <div class="w3-container">
+                        <div class="w3-light-gray w3-round-xlarge">
+                            <div class="w3-container w3-green w3-round-xlarge" style="width: {{row[6]}}%"> <center style="color:black;"> {{row[6]}}% </center></div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    <br>
+                </div>
+            </div>
+            {% endfor %}
+
+    </div>
+{% endif %}
+    <br>
+
+    <section>
+        <h2 class="heading-1 mb4x">Featured Fundraisers</h2>
+    </section>
+
+    <form action="" class="options">
+        <select id="tag" onchange="getTag(this.value)">
+            <option value="All">All Fundraisers</option>
+            <option value="Animals">Animals</option>
+            <option value="Business">Business</option>
+            <option value="Community">Community</option>
+            <option value="Creative">Creative</option>
+            <option value="Education">Education</option>
+            <option value="Emergencies">Emergencies</option>
+            <option value="Environment">Environment</option>
+            <option value="Event">Event</option>
+            <option value="Faith">Faith</option>
+            <option value="Family">Family</option>
+            <option value="Funeral and Memorial">Funeral and Memorial</option>
+            <option value="Medical">Medical</option>
+            <option value="Monthly Bills">Monthly Bills</option>
+            <option value="Newlyweds">Newlyweds</option>
+            <option value="Other">Other</option>
+            <option value="Sports">Sports</option>
+            <option value="Travel">Travel</option>
+            <option value="Volunteer">Volunteer</option>
+            <option value="Wishes">Wishes</option>
+        </select>
+    </form>
+
+    <div id="fundList" class="fundraiser-container">
+
+            {% for row in fundraiserTable %}
+            <div class="fundraiser-boxes">
+                <center>
+                    <li><a href="fundraiser/{{ row[2] }}" style="text-decoration:none">  <h7 style="font-size: 20px"> <strong>{{row[0]}} </strong> <br> </h7> <img src="/static/{{row[3]}}" alt="no image" width="350" height="350"> </a></li>
+                    Created By: {{row[7]}} <br> <br>
+                    <div class="container">
+                        <p>{{row[1]}}</p>
+                    </div>
+                </center>
+                <br><br>
+                <div class="bottom">
+                    <p style="text-align:left;">
+                        Balance: ${{row[5]}}
+                        <span style="float:right;">
+                            Goal: ${{row[4]}}
+                        </span>
+                    </p>
+                    {% if row[6] >= 100 %}
+                    <div class="w3-container">
+                        <div class="w3-light-grey w3-round-xlarge">
+                            <div class="w3-container w3-green w3-round-xlarge" style="width: 100%"> <center style="color:black;"> {{row[6]}}% </center> </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if row[6] < 100 %}
+                    <div class="w3-container">
+                        <div class="w3-light-gray w3-round-xlarge">
+                            <div class="w3-container w3-green w3-round-xlarge" style="width: {{row[6]}}%"> <center style="color:black;"> {{row[6]}}% </center></div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    <br>
+                </div>
+            </div>
+            {% endfor %}
+
+    </div>
+    <br>
+
+<script>
+function getTag(str) {
+  if (str == "") {
+    document.getElementById("fundList").innerHTML = "";
+    return;
+  }
+
+  const xhttp = new XMLHttpRequest();
+  xhttp.onload = function() {
+    document.getElementById("fundList").innerHTML = this.responseText;
+  }
+  xhttp.open("GET", "/tagSort/"+str);
+  xhttp.send();
+}
+</script>
+
+<script>
+window.onscroll = function() {myFunction()};
+
+var topnav = document.getElementById("topnav");
+var sticky = topnav.offsetTop;
+
+function myFunction() {
+  if (window.pageYOffset >= sticky) {
+    topnav.classList.add("sticky")
+  } else {
+    topnav.classList.remove("sticky");
+  }
+}
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.min.js" integrity="sha384-IDwe1+LCz02ROU9k972gdyvl+AESN10+x7tBKgc9I5HFtuNz0wWnPclzo6p9vxnk" crossorigin="anonymous"></script>
+</body>

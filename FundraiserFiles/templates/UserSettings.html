@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Profile: {{ name }}</title>
+
+    <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='custom-fonts.css') }}"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.5/css/select2.css" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
+
+  <style>
+
+      * {box-sizing: border-box; font-family: ubuntu;}
+
+        button{
+        margin-left: 375px;
+        }
+
+
+        body{
+            background: #eee !important;
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        form{
+         margin-top: 75px;
+         }
+
+        .wrapper{
+            margin-top: 300px;
+            max-width: 600px;
+            padding: 15px 35px 45px;
+            margin: auto;
+            background-color: #fff;
+            border: 5px solid rgba(0,0,0,0.1);
+
+            .container{
+                margin-top: 80px;
+                margin-bottom: 80px;
+            }
+
+            .form-details{
+                margin-bottom: 30px;
+            }
+
+            .form-control{
+                position: relative;
+                font-size: 16px;
+                height: auto;
+                padding: 10px;
+                @include box-sizing(border-box);
+
+                &:focus {
+                  z-index: 2;
+                }
+            }
+        }
+
+        input[type="text"]{
+                margin-bottom: -1px;
+                border-bottom-left-radius: 0;
+                border-bottom-right-radius: 0;
+        }
+
+    input[type=text] {
+    width: 50%
+    }
+
+    .header {
+  background-color: #f1f1f1;
+  padding: 30px;
+  text-align: center;
+}
+
+    .topnav {
+  overflow: hidden;
+  background-color: #333;
+}
+    .topnav a {
+  float: left;
+  display: block;
+  color: #f2f2f2;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+}
+    .topnav a:hover {
+  background-color: #61C957;
+  color: black;
+}
+
+  </style>
+
+
+</head>
+
+<body>
+<div class="topnav">
+    <a class="active" href="/dashboard">Home</a>
+</div>
+
+<div>
+        <h1 class="container-fluid p-3 bg-success text-white text-center">USER SETTINGS</h1><br>
+
+        <form action="/recordingNewUserSettings"  method="post">
+            <div class="wrapper">
+                <div>
+                    <br>
+                    <legend class="form-details">Personal Details:</legend>
+                    <br>
+                    <label for="Name">Full Name:
+                    {% if flag[0] == 1 %}
+                        <b style="color:red;">*</b>
+                        {% endif %}</label>
+                    <br>
+                    <input type="text" id="Name" name="Name" class="form-control" value="{{name}}">
+                    {% if flag[0] == 1 %}
+                        <i style="color:red;">Must be between 5 to 40 characters long.</i>
+                        {% endif %}
+                    <br>
+                    <label for="UserName">Username:
+                    {% if flag[2] == 1 %}
+                        <b style="color:red;">*</b>
+                        {% endif %}</label>
+                    <br>
+                    <input type="text" id="UserName" name="UserName" class="form-control" value="{{ username}}">
+                    {% if flag[2] == 1 %}
+                        <i style="color:red;">Username must be between 5 to 20 characters.</i>
+                        {% endif %}
+                    <br>
+                    <label for="Password">Password:
+                    {% if flag[3] == 1 %}
+                        <b style="color:red;">*</b>
+                        {% endif %}</label>
+                    <br>
+                    <input type="password" id="Password" name="Password" class="form-control" value="{{password}}">
+                    {% if flag[3] == 1 %}
+                        <i style="color:red;">Password must be 8 to 20 characters long and include at least ONE uppercase letter, ONE special character, and ONE number.</i><br>
+                        {% endif %}
+                    <br>
+                    <label for="PhoneNumber">Phone Number:
+                    {% if flag[4] == 1 %}
+                        <b style="color:red;">*</b>
+                        {% endif %}</label>
+                    <br>
+                    <input type="text" id="PhoneNumber" name="PhoneNumber" class="form-control" value="{{phonenumber}}">
+                    {% if flag[4] == 1 %}
+                        <i style="color:red;">An invalid phone number was entered.</i>
+                        {% endif %}
+                    <br>
+                </div>
+
+                <div>
+                    <br>
+                    <legend>Billing Address:</legend>
+                    <br>
+                    <label for="StreetAddress">Street Address:
+                    {% if flag[5] == 1 %}
+                        <b style="color:red;">*</b>
+                        {% endif %}</label>
+                    <br>
+                    <input type="text" id="StreetAddress" name="StreetAddress" class="form-control" value="{{streetaddress}}">
+                    <br>
+                    <label for="City">City:
+                    {% if flag[6] == 1 %}
+                        <b style="color:red;">*</b>
+                        {% endif %}</label>
+                    <br>
+                    <input type="text" id="City" name="City" class="form-control" value="{{ city }}">
+                    <br>
+                    <label for="State">State:</label>
+                    <br>
+                    <input type="text" id="State" name="State" class="form-control" value="{{ state}}">
+                    <br>
+                    <label for="ZipCode">Zip Code:
+                    {% if flag[8] == 1 %}
+                        <b style="color:red;">*</b>
+                        {% endif %}</label>
+                    <br>
+                    <input type="text" id="ZipCode" name="ZipCode" class="form-control" value="{{ zipcode }}">
+                    {% if flag[8] == 1 %}
+                        <i style="color:red;">An invalid zip code was entered</i>
+                        {% endif %}
+                    <br>
+                    <label for="Country">Country:
+                    {% if flag[9] == 1 %}
+                        <b style="color:red;">*</b>
+                        {% endif %}</label>
+                    <br>
+                    <input type="text" id="Country" name="Country" class="form-control" value="{{ country}}">
+                    <br>
+                </div>
+
+                <div>
+                    <br>
+                    <legend>Payment Information</legend>
+
+                    <p>Select A Payment Option:</p>
+                    <div>
+                        <input type="radio" id="creditCard" name="paymentOptionToggle" value="creditCard" {{'checked' if isUsingCreditCard else ''}}></input>
+                            <label for="creditCard">Use A Credit Card: </label>
+                        <br>
+                        <input type="radio" id="bankInfo" name="paymentOptionToggle" value="bankInfo" {{'checked' if not isUsingCreditCard else ''}}></input>
+                            <label for="bankInfo">Use A Bank Account: </label>
+                    </div>
+                    <br>
+
+                    <div id="selectCreditCardCode">
+                        <div class="form-header">
+                            <h5 class="title">Credit Card Information</h5>
+                        </div>
+                        <label  for="CardNumber">Card number:
+                        {% if flag[10] == 1 %}
+                        <b style="color:red;">*</b>
+                        {% endif %}</label>
+                        <br>
+                        <input type="text" id="CardNumber" name="CardNumber" class="form-control" value="{{ cardnumber }}">
+                        {% if flag[10] == 1 %}
+                            <i style="color:red;">An invalid card number was entered. Card numbers must be 16 digits long.</i>
+                        {% endif %}<br>
+                        <div class="dropdown">
+                            <div class="month">
+                                <p>Expiration Month:</p>
+                                <select id="Month" name="Month">
+                                    <option value="{{month}}" selected>{{month}}</option>
+                                    {% for number in range(1, 13)%}
+                                        {% if number != month %}
+                                            <option value="{{number}}">{{number}}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="year">
+                                <p>Expiration Year:</p>
+                                <select id="Year" name="Year">
+                                    <option value="{{year}}" selected>{{year}}</option>
+                                    {% for number in range(2023, 2029)%}
+                                        {% if number != year %}
+                                            <option value="{{number}}">{{number}}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div><br>
+
+                        </div>
+                    </div>
+
+                    <div id="selectBankAccountCode" style="display:none">
+                        <div class="form-header">
+                            <h5 class="title">Bank Account Details</h5>
+                        </div>
+                        <label for="RoutingNumber">Routing Number:
+                        {% if flag[12] == 1 %}
+                            <b style="color:red;">*</b>
+                            {% endif %}</label>
+                        <br>
+                        <input type="text" id="RoutingNumber" name="RoutingNumber" class="form-control"  value="{{ routeno }}">
+                        {% if flag[12] == 1 %}
+                            <i style="color:red;">An invalid routing number was entered.</i>
+                            {% endif %}
+                        <br>
+                        <label for="AccountNumber">Account Number:
+                        {% if flag[13] == 1 %}
+                            <b style="color:red;">*</b>
+                            {% endif %}</label>
+                        <br>
+                        <input type="text" id="AccountNumber" name="AccountNumber" class="form-control" value="{{ accountno }}">
+                        {% if flag[13] == 1 %}
+                            <i style="color:red;">An invalid account number was entered.</i>
+                            {% endif %}
+                        <br><br><br><br>
+                    </div>
+                    <input type="submit" value="SUBMIT">
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <br>
+    <button class="btn btn-default" onclick="history.back()">Go Back</button>
+    <br><br>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.min.js" integrity="sha384-IDwe1+LCz02ROU9k972gdyvl+AESN10+x7tBKgc9I5HFtuNz0wWnPclzo6p9vxnk" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+
+<script type="text/javascript">
+    const creditCardSelect = document.getElementById('selectCreditCardCode');
+    const bankAccountSelect = document.getElementById('selectBankAccountCode');
+
+    function handleRadioClick() {
+    if (document.getElementById('creditCard').checked) {
+        creditCardSelect.style.display = 'block';
+    } else {
+        creditCardSelect.style.display = 'none';
+    }
+
+    if (document.getElementById('bankInfo').checked) {
+        bankAccountSelect.style.display = 'block';
+    } else {
+        bankAccountSelect.style.display = 'none';
+    }
+    }
+
+    const radioButtons = document.querySelectorAll('input[name="paymentOptionToggle"]');
+    radioButtons.forEach(radio => {
+    radio.addEventListener('click', handleRadioClick);
+    });
+    </script>
+
+<script>
+window.onscroll = function() {myFunction()};
+
+var topnav = document.getElementById("topnav");
+var sticky = topnav.offsetTop;
+
+function myFunction() {
+  if (window.pageYOffset >= sticky) {
+    topnav.classList.add("sticky")
+  } else {
+    topnav.classList.remove("sticky");
+  }
+}
+</script>
+
+
+</body>
+</html>

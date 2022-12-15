@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Make a new Donation</title>
+
+    <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='custom-fonts.css') }}"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.5/css/select2.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
+
+    <style>
+
+    * {box-sizing: border-box; font-family: ubuntu;}
+
+    h2{
+        text-align: center;
+        text-transform: uppercase;}
+
+    h3{text-align: center;}
+
+    button{margin-left: 375px;}
+
+    body{
+        background: #eee !important;
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;}
+
+    .banner{
+        color: #4CAF50;
+        margin-left: 0px;}
+
+    form{margin-top: 50px;}
+
+    .wrapper{
+        margin-top: 300px;
+        max-width: 450px;
+        padding: 15px 35px 45px;
+        margin: auto;
+        background-color: #fff;
+        border: 5px solid rgba(0,0,0,0.1);
+
+        .container{
+            margin-top: 80px;
+            margin-bottom: 80px;}
+
+
+        .form-details{margin-bottom: 30px;}
+
+        .form-control{
+            position: relative;
+            font-size: 16px;
+            height: auto;
+            padding: 10px;
+            @include box-sizing(border-box);
+
+            &:focus {
+                z-index: 2;}}}
+
+
+    .topnav {
+      overflow: hidden;
+      background-color: #333;}
+
+    .header {
+      background-color: #f1f1f1;
+      padding: 30px;
+      text-align: center;}
+
+    .topnav a {
+      float: left;
+      display: block;
+      color: #f2f2f2;
+      text-align: center;
+      padding: 14px 16px;
+      text-decoration: none;
+      font-size: 17px;}
+
+    .topnav a:hover {
+      background-color: #61C957;
+      color: black;}
+    </style>
+</head>
+
+<body>
+
+{% if isGuest == False %}
+<!--responsive banner-->
+<div class="topnav">
+    <a href="/dashboard">Home</a>
+    <a href="/log-out">Log out</a>
+    <a href="/new-fundraiser">New Fundraiser</a>
+    <a href="/settings">Settings</a>
+</div>
+
+<!-- welcome for user -->
+<h2 class="container-fluid p-3 bg-success text-white text-center">Hello, {{ name }}</h2>
+<br>
+
+<!-- donating as user -->
+<h3>Donating To: </h3>
+<br>
+<h3 class="banner">{{ fundraiser_name }}</h3>
+
+<form action="/submittingDonation" method="post">
+    <div class="wrapper">
+        <div class="container">
+            <input type="hidden" class="form-control" name="fund_id" value="{{ fundraiser_ID }}"/>
+            <label for="amount">Donation Amount:
+            {% if flag[0] == 1 %}
+                        <b style="color:red;">*</b>
+                        {% endif %}</label>
+            <br>
+            <div><p style="float:left; font-size:25px;">$ </p>
+                <input type="text" class="form-control" style="width:95.925%;" id="amount" name="amount" autocomplete="off" placeholder="Enter Amount" value="{{ inputData[1] }}">
+            </div>
+            {% if flag[0] == 1 %}
+                        <i style="color:red;">Invalid donation amount. Donations must be greater than $1.00.</i>
+                        {% endif %}
+            <br>
+
+            <!-- email -->
+            <label for="email">Email: </label><br>
+            <input type="text" class="form-control" id="email" name="email" value="{{ email }}" readonly="readonly" /><br>
+
+            <!-- billing address -->
+            <legend>Billing Address:</legend>
+            <input type="text" class="form-control" id="address" value="{{streetAddress}}" readonly="readonly" /><br>
+            <input type="text" class="form-control" id="inputCountry" value="{{restOfAddress}}" readonly="readonly"/><br>
+
+            {% if creditCardOption == True %}
+            <div class="form-body">
+                <legend>Banking Information</legend>
+                <!-- Card Number -->
+                <input type="text" class="form-control" value="{{cardNum}}"readonly="readonly"/><br>
+
+                <!-- Date Field -->
+                <div class="date-field">
+                    <input type="text" class="form-control" value = "{{expirationDate}}" readonly="readonly" /><br>
+                </div>
+
+                <!-- Card Verification Field :: We cannot verify CVV but we need to constrain it to 3 digits at least-->
+                <div class="card-verification">
+                    <div class="cvv-input">
+                        <label for="cvv">CVV:
+                        {% if flag[7] == 1 %}
+                            <b style="color:red;">*</b>
+                        {% endif %}</label>
+                        <input type="text" class="form-control" name="cvv" autocomplete="off" placeholder="CVV" value="{{ inputData[3] }}">
+                        {% if flag[7] == 1 %}
+                            <i style="color:red;">An invalid cvv was entered.</i>
+                        {% endif %}<br>
+                        * Payment option can be changed to a Bank Account in user settings.<br>
+                    </div>
+                </div>
+            </div>
+            <input type="hidden" class="form-control" name="paymentOptionToggle" value="creditCard"/>
+            {% endif %}
+            {% if creditCardOption == False %}
+
+            <!-- Bank Account -->
+            <div class="form-header">
+                <h5 class="title">Bank Account detail</h5>
+            </div>
+
+            <label for="RoutingNumber">Routing Number:
+            {% if flag[8] == 1 %}
+                        <b style="color:red;">*</b>
+                        {% endif %}</label><br>
+            <input type="text" id="Routing-Number" name="RoutingNumber" value="{{routingNum}}" class="form-control" placeholder="Enter Routing Number" readonly="readonly"/>
+            {% if flag[8] == 1 %}
+                        <i style="color:red;">An invalid routing number was entered.</i>
+                        {% endif %}
+            <br>
+            <label  for="account-number">Account Number:
+            {% if flag[9] == 1 %}
+                        <b style="color:red;">*</b>
+                        {% endif %}</label><br>
+            <input type="text" class="form-control" id="account-number" name="AccountNumber" value="{{accountNum}}" placeholder="Enter Bank Account number" readonly="readonly"/>
+            {% if flag[9] == 1 %}
+                        <i style="color:red;">An invalid account number was entered.</i>
+                        {% endif %}<br>
+            * Payment option can be changed to a Credit Card in user settings.<br>
+            <input type="hidden" class="form-control" name="paymentOptionToggle" value="bankInfo"/>
+            {% endif %}
+            <br>
+            <input type="submit" value="SUBMIT"/>
+        </div>
+    </div>
+</form>
+{% endif %}
+
+{% if isGuest == True %}
+<div class="topnav">
+    <a href="/dashboard">Home</a>
+    <a href="/login">Login</a>
+    <a href="/new-user-form">Sign Up!</a>
+</div>
+<!-- welcome for guest -->
+<h2 class="container-fluid p-3 bg-success text-white text-center">Hello, you'll be making your donation as a {{ name }}</h2>
+
+<br>
+<!-- donating for guest -->
+<h3>Donating To: </h3>
+<br>
+<h3 class="banner">{{ fundraiser_name }}</h3>
+
+<form action="/submittingDonation" method="post">
+    <div class="wrapper">
+        <div class="container">
+            <input type="hidden" class="form-control" name="fund_id" value="{{ fundraiser_ID }}"/>
+            <legend>Donation Amount:
+            {% if flag[0] == 1 %}
+                        <b style="color:red;">*</b>
+                        {% endif %}</legend>
+            <br>
+            <div><p style="float:left; font-size:25px;">$ </p>
+                <input type="text" class="form-control" style="width:95.925%;" id="guestAmount" name="amount" autocomplete="off" placeholder="Enter Amount" value="{{ inputData[1] }}">
+            </div>
+            {% if flag[0] == 1 %}
+                        <i style="color:red;">Invalid donation amount. Donations must be greater than $1.00.</i>
+                        {% endif %}
+            <br><br>
+
+            <legend>Billing Address:</legend>
+            <!-- billing address -->
+            <label for="StreetAddress">Street Address:
+            {% if flag[2] == 1 %}
+                        <b style="color:red;">*</b>
+                        {% endif %}</label><br>
+            <input type="text" id="StreetAddress" name="StreetAddress" class="form-control" placeholder="Street Address" value="{{ inputData[2] }}" />
+            <br>
+            <label for="City">City:
+            {% if flag[4] == 1 %}
+                        <b style="color:red;">*</b>
+                        {% endif %}</label><br>
+            <input type="text" id="City" name="City" class="form-control" placeholder="City" value="{{ inputData[3] }}"/>
+            <br>
+            <label for="State">State:</label><br>
+            <input type="text" id="State" name="State" class="form-control" placeholder="State" value="{{ inputData[4] }}"/>
+            <br>
+            <label for="ZipCode">Zip Code:
+            {% if flag[1] == 1 %}
+                        <b style="color:red;">*</b>
+                        {% endif %}</label><br>
+            <input type="text" id="ZipCode" name="ZipCode" class="form-control" placeholder="Zip Code" value="{{ inputData[5] }}"/>
+            {% if flag[1] == 1 %}
+                        <i style="color:red;">An invalid zip code was entered.</i>
+                        {% endif %}
+            <br>
+            <label for="Country">Country:
+            {% if flag[5] == 1 %}
+                        <b style="color:red;">*</b>
+                        {% endif %}</label><br>
+            <input type="text" id="Country" name="Country" class="form-control" placeholder="Country" value="{{ inputData[6] }}"/>
+            <br>
+            <hr>
+            <div class="form-body">
+                <legend>Payment Information</legend>
+
+                <p>Select A Payment Option:</p>
+                    <div>
+                        <input type="radio" id="creditCard" name="paymentOptionToggle" value="creditCard" checked>
+                            <label for="creditCard">Use A Credit Card:</label>
+                        <br>
+                        <input type="radio" id="bankInfo" name="paymentOptionToggle" value="bankInfo">
+                            <label for="bankInfo">Use A Bank Account:</label>
+                    </div>
+                    <br>
+
+                    <div id="selectCreditCardCode">
+                    <div class="form-header">
+                        <h5 class="title">Credit Card Information</h5>
+                    </div>
+                    <label  for="CardNumber">Card number:
+                    {% if flag[6] == 1 %}
+                        <b style="color:red;">*</b>
+                        {% endif %}</label><br>
+                    <input type="text" id="CardNumber" name="CardNumber" class="form-control" placeholder="Enter Card Number" value="{{ inputData[8] }}">
+                        {% if flag[6] == 1 %}
+                        <i style="color:red;">An invalid card number was entered.</i>
+                        {% endif %}<br>
+                    <div class="dropdown">
+                        <div class="month">
+                            Expiration Month:
+                            <select id="Month" name="Month">
+                                <option value="01" selected>January</option>
+                                <option value="02">February</option>
+                                <option value="05">May</option>
+                                <option value="06">June</option>
+                                <option value="07">July</option>
+                                <option value="08">August</option>
+                                <option value="09">September</option>
+                                <option value="10">October</option>
+                                <option value="11">November</option>
+                                <option value="12">December</option>
+                            </select>
+                        </div>
+                        <div class="year">
+                            <p>Expiration Year:</p>
+                            <select id="Year" name="Year">
+                                <option value="2023" selected>2023</option>
+                                <option value="2024">2024</option>
+                                <option value="2025">2025</option>
+                                <option value="2026">2026</option>
+                            </select>
+                        </div><br>
+                        <!-- Card Verification Field :: We cannot verify CVV but we need to constrain it to 3 digits at least-->
+                        <div class="card-verification">
+                            <div class="cvv-input">
+                                <label for="cvv">CVV:
+                                {% if flag[7] == 1 %}
+                        <b style="color:red;">*</b>
+                        {% endif %}</label>
+                                <input type="text" id="cvv" name="cvv" class="form-control" autocomplete="off" placeholder="CVV" value="{{ inputData[11] }}">
+                                {% if flag[7] == 1 %}
+                        <i style="color:red;">An invalid cvv was entered.</i>
+                        {% endif %}
+                                <br>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+
+                    <div id="selectBankAccountCode" style="display:none">
+
+                    <div class="form-header">
+                        <h5 class="title">Bank Account detail</h5>
+                        </div>
+                    <label for="RoutingNumber">Routing Number:
+                    {% if flag[8] == 1 %}
+                        <b style="color:red;">*</b>
+                        {% endif %}</label><br>
+                    <input type="text" id="RoutingNumber" name="RoutingNumber" class="form-control" placeholder="Enter Routing Number" value="{{ inputData[12] }}">
+                    {% if flag[8] == 1 %}
+                        <i style="color:red;">An invalid routing number was entered.</i>
+                        {% endif %}
+                        <br>
+                    <label for="AccountNumber">Account Number:
+                    {% if flag[9] == 1 %}
+                        <b style="color:red;">*</b>
+                        {% endif %}</label><br>
+                    <input type="text" id="AccountNumber" name="AccountNumber" class="form-control" placeholder="Enter Account Number" value="{{ inputData[13] }}">
+                    {% if flag[9] == 1 %}
+                        <i style="color:red;">An invalid account number was entered.</i>
+                        {% endif %}
+                        <br><br><br><br>
+
+            </div>
+            <input type="submit" value="SUBMIT">
+            </fieldset>
+            </div>
+        </div>
+    </div>
+</form>
+{% endif %}
+
+    <br>
+    <button class="btn btn-default" onclick="history.back()">Go Back</button>
+    <br><br>
+
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.min.js" integrity="sha384-IDwe1+LCz02ROU9k972gdyvl+AESN10+x7tBKgc9I5HFtuNz0wWnPclzo6p9vxnk" crossorigin="anonymous"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+
+<script type="text/javascript">
+    const creditCardSelect = document.getElementById('selectCreditCardCode');
+    const bankAccountSelect = document.getElementById('selectBankAccountCode');
+
+    function handleRadioClick() {
+    if (document.getElementById('creditCard').checked) {
+        creditCardSelect.style.display = 'block';
+        $("#RoutingNumber").val(null);
+        $("#AccountNumber").val(null);
+    } else {
+        creditCardSelect.style.display = 'none';
+    }
+
+    if (document.getElementById('bankInfo').checked) {
+        bankAccountSelect.style.display = 'block';
+        $("#CardNumber").val(null);
+        $("#Month").val(null);
+        $("#Year").val(null);
+        $("#cvv").val(null);
+    } else {
+        bankAccountSelect.style.display = 'none';
+    }
+    }
+
+    const radioButtons = document.querySelectorAll('input[name="paymentOptionToggle"]');
+    radioButtons.forEach(radio => {
+    radio.addEventListener('click', handleRadioClick);
+    });
+</script>
+
+<script>
+window.onscroll = function() {myFunction()};
+
+var topnav = document.getElementById("topnav");
+var sticky = topnav.offsetTop;
+
+function myFunction() {
+  if (window.pageYOffset >= sticky) {
+    topnav.classList.add("sticky")
+  } else {
+    topnav.classList.remove("sticky");
+  }
+}
+</script>
+
+</body>
+</html>
